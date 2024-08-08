@@ -7,7 +7,7 @@ Compose replacement for [Autosizing TextView](https://developer.android.com/deve
 ---
 Add the dependency to your `build.gradle.kts` file.
 ```kotlin
-implementation("com.sillydevices:compose.ui.autosizetext:0.1.0")
+implementation("com.sillydevices:compose.ui.autosizetext:0.1.1")
 ```
 
 ## Usage
