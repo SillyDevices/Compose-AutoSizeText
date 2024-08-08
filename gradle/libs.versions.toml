@@ -1,0 +1,27 @@
+[versions]
+
+kotlin = "2.0.0"
+
+androidGradlePlugin = "8.2.0"
+compose-plugin = "1.6.11"
+
+publishVersion = "0.29.0"
+
+junit = "4.13.2"
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose= { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+
+vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "publishVersion" }
+
+[libraries]
+
+junit = { module = "junit:junit", version.ref = "junit" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
+compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
