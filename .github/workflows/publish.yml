@@ -20,11 +20,6 @@ jobs:
         uses: gradle/wrapper-validation-action@v1
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      - name: Set artifact version to ENV
-        run: echo "ARTIFACT_VERSION=v$(./gradlew -q getArtifactVersion)" >>$GITHUB_ENV
-      - name: Compare tag and artifact versions
-        if: ${{ env.TAG_VERSION != env.ARTIFACT_VERSION }}
-        run: exit 1
       - name: Build and Publish with Gradle
         env:
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_IN_MEMORY_KEY_ID }}
@@ -32,4 +27,4 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_IN_MEMORY_KEY }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-        run: ./gradlew library:publishAllPublicationsToMavenCentralRepository
+        run: ./gradlew library:publishAllPublicationsToMavenCentralRepository -PgitTag=${TAG_VERSION}

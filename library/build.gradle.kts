@@ -154,10 +154,20 @@ publishing {
     }
 }
 
-task("getArtifactVersion") {
+task("checkArtifactVersion") {
+    //./gradlew publishAllToMavenCentralRepository -PgitTag=v0.1.1
     doLast {
-        println(artifactVersion)
+        val actualVersion = findProperty("gitTag")
+        when(actualVersion) {
+            null -> throw GradleException("gitTag property is not set(-PgitTag=vX.X.X)")
+            "v${artifactVersion}" -> { }
+            else -> throw GradleException("Artifact version is incorrect(actual = $actualVersion, expected = $artifactVersion)\ngitTag must start with 'v'")
+        }
     }
+}
+
+tasks.withType(PublishToMavenRepository::class) {
+    dependsOn("checkArtifactVersion")
 }
 
 dependencies {
