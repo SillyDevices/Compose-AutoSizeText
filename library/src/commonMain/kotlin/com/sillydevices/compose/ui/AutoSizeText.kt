@@ -23,11 +23,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.takeOrElse
 import kotlin.math.min
 
@@ -109,7 +108,20 @@ fun AutoSizeText(
                 minFontSize = minFontSize,
         ) }
 
-        val bestFontSize = remember(choices, testOverflow) {
+        val bestFontSize = remember(
+            choices,
+            density,
+            constraints,
+            text,
+            mergedStyle,
+            maxLines,
+            softWrap,
+            layoutDirection,
+            adjustLineHeight,
+            coercedLineSpaceRatio,
+            fontFamilyResolver,
+            textMeasurer,
+        ) {
             findBestFontSize(choices, density, testOverflow)
         }
 
@@ -155,19 +167,26 @@ private fun createSizeChoices(
     minFontSize: TextUnit = TextUnit.Unspecified,
     maxFontSize: TextUnit = TextUnit.Unspecified,
 ): IntProgression {
-    val intSize = containerSize.takeOrElse { DpSize.Zero }
-        .run { with(density) { IntSize(width.roundToPx(), height.roundToPx()) } }
-        .run { min(width, height) }
+    val size = containerSize.takeOrElse { DpSize.Zero }
+    val intSize = min(size.width.toFontSizeBoundPx(density), size.height.toFontSizeBoundPx(density))
+        .coerceAtLeast(MIN_FONT_SIZE_PX)
     val max = maxFontSize.takeIf { it.isSp }
-        ?.let { with(density) { if (it.isSpecified) it.roundToPx() else 0 } }
-        ?.coerceIn(0..intSize)
+        ?.let { with(density) { it.roundToPx() } }
+        ?.coerceIn(MIN_FONT_SIZE_PX, intSize)
         ?: intSize
     val min = minFontSize.takeIf { it.isSp }
         ?.let { with(density) { it.roundToPx() } }
-        ?.coerceIn(range = 0..max)
-        ?: 0
+        ?.coerceIn(MIN_FONT_SIZE_PX, max)
+        ?: MIN_FONT_SIZE_PX
     return min..max step 1
 }
+
+private fun Dp.toFontSizeBoundPx(density: Density): Int =
+    if (value.isFinite()) with(density) { roundToPx() } else UNBOUNDED_FONT_SIZE_LIMIT_PX
+
+private const val MIN_FONT_SIZE_PX = 1
+
+private const val UNBOUNDED_FONT_SIZE_LIMIT_PX = 512
 
 private fun findBestFontSize(
     choices: IntProgression,
